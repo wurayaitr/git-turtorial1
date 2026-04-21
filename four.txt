@@ -10,3 +10,14 @@ exit
 
 
 \App\Models\User::where('email', 'superadmin@gmb.com')->first()->getRoleNames();
+
+
+
+<VirtualHost *:80>
+    DocumentRoot "C:/xampp/htdocs/YOUR-REPO-NAME/public"
+    ServerName localhost
+    <Directory "C:/xampp/htdocs/YOUR-REPO-NAME/public">
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
