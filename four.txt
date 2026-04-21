@@ -1,11 +1,13 @@
 $user = \App\Models\User::create([
-    'name'       => 'System Administrator',
-    'email'      => 'superadmin@gmb.com',
-    'password'   => bcrypt('Admin@1234'),
-    'status'     => 'active',
-    'department_id' => \App\Models\Department::first()->id,
+    'name'            => 'System Administrator',
+    'email'           => 'superadmin@gmb.com',
+    'password'        => bcrypt('Admin@1234'),
+    'status'          => 'active',
+    'employee_id'     => 'GMB-ADM-00001',
+    'department_id'   => \App\Models\Department::first()->id,
 ]);
 $user->assignRole('super-admin');
+
 exit
 
 
