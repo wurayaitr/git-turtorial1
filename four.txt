@@ -23,3 +23,6 @@ exit
         Require all granted
     </Directory>
 </VirtualHost>
+
+
+\App\Models\User::withTrashed()->where('email', 'javangwee@gmbdura.co.zw')->forceDelete();
