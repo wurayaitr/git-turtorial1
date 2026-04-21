@@ -7,3 +7,6 @@ $user = \App\Models\User::create([
 ]);
 $user->assignRole('super-admin');
 exit
+
+
+\App\Models\User::where('email', 'superadmin@gmb.com')->first()->getRoleNames();
