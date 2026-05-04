@@ -1,2 +1,4 @@
-three
-33
+Mail::raw('Test email', function($m) {
+    $m->to('tapiwanasheronaldowurayai@gmail.com')->subject('Test');
+});
+echo 'Sent!';
