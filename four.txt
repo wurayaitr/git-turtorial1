@@ -10,16 +10,7 @@ $user->assignRole('super-admin');
 
 exit
 
- <nav class="flex-1 px-2 py-3 overflow-y-auto overflow-x-hidden" style="scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.15) transparent;">
-            @php
-                $pendingBadge = auth()->user()->approvals()->where('action','pending')->count() ?: null;
-                $notifBadge   = auth()->user()->appNotifications()->unread()->count() ?: null;
-                $sharingBadge = auth()->user()->totalSharingNotifications() ?: null;
-                $isSuperAdmin = auth()->user()->hasRole('super-admin');
-                $isAdmin      = auth()->user()->hasAnyRole(['admin', 'super-admin']);
-                $isDirector   = auth()->user()->hasRole('director') && ! $isAdmin;
-                $isApprover   = auth()->user()->hasAnyRole(['admin','super-admin','director','approver']);
-            @endphp
+ <nav class="flex-1 px-2 py-3 overflow-y-auto overflow-x-hidden" style="scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.15) [2026-05-04 08:04:17] local.ERROR: PDF preview failed: The path is a directory: C:\xampp\htdocs\Enterprise-Digital-Filing-System\storage\app/private\[0] {"document_id":21} 
 
             {{-- ── MAIN ── --}}
 \App\Models\User::where('email', 'superadmin@gmb.com')->first()->getRoleNames();
