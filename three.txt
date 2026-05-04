@@ -2,3 +2,6 @@ Mail::raw('Test email', function($m) {
     $m->to('tapiwanasheronaldowurayai@gmail.com')->subject('Test');
 });
 echo 'Sent!';
+
+
+  Symfony\Component\Mailer\Exception\TransportException  Connection could not be established with host "smtp.gmail.com:587": stream_socket_client(): Unable to connect to smtp.gmail.com:587 (A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond).
