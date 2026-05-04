@@ -10,7 +10,7 @@ $user->assignRole('super-admin');
 
 exit
 
-
+ANTHROPIC_API_KEY=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
 \App\Models\User::where('email', 'superadmin@gmb.com')->first()->getRoleNames();
 
 
