@@ -10,7 +10,8 @@ $user->assignRole('super-admin');
 
 exit
 
-
+[2026-05-04 05:54:36] local.ERROR: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: enterprise_digital_filing_system, SQL: select exists (select 1 from information_schema.tables where table_schema = schema() and table_name = 'migrations' and table_type in ('BASE TABLE', 'SYSTEM VERSIONED')) as `exists`) {"exception":"[object] (Illuminate\\Database\\QueryException(code: 2002): SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it (Connection: mysql, Host: 127.0.0.1, Port: 3306, Database: enterprise_digital_filing_system, SQL: select exists (select 1 from information_schema.tables where table_schema = schema() and table_name = 'migrations' and table_type in ('BASE TABLE', 'SYSTEM VERSIONED')) as `exists`) at C:/xampp/htdocs/Enterprise-Digital-Filing-System/vendor/laravel/framework/src/Illuminate/Database/Connection.php:838)
+[stacktrace]
 \App\Models\User::where('email', 'superadmin@gmb.com')->first()->getRoleNames();
 
 
