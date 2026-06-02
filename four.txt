@@ -29,10 +29,14 @@ exit
 
 \App\Models\User::withTrashed()->where('email', 'javangwee@gmbdura.co.zw')->forceDelete();
 
-
-[2026-04-22 10:53:14] local.ERROR: FailedToExecuteCommand `"gswin64c.exe" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 "-sDEVICE=pngalpha" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 "-r150x150" -dPrinted=false -dFirstPage=1 -dLastPage=1 "-sOutputFile=C:/Users/IT7A49~1.STU/AppData/Local/Temp/magick-2iv9qddmTZNWZtklFwnnclS1t4G_Oycp%d" "-fC:/Users/IT7A49~1.STU/AppData/Local/Temp/magick-ohwpdzjkln0fJ6SxSENQh_7dLf9tY-jH" "-fC:/Users/IT7A49~1.STU/AppData/Local/Temp/magick-fJNZLpfoeybJ3gC2B6H2Hze4pKW0aZk4"' (The system cannot find the file specified.
-) @ error/delegate.c/ExternalDelegateCommand/516 {"userId":1,"exception":"[object] (ImagickException(code: 415): FailedToExecuteCommand `\"gswin64c.exe\" -q -dQUIET -dSAFER -dBATCH -dNOPAUSE -dNOPROMPT -dMaxBitmap=500000000 -dAlignToPixels=0 -dGridFitTT=2 \"-sDEVICE=pngalpha\" -dTextAlphaBits=4 -dGraphicsAlphaBits=4 \"-r150x150\" -dPrinted=false -dFirstPage=1 -dLastPage=1 \"-sOutputFile=C:/Users/IT7A49~1.STU/AppData/Local/Temp/magick-2iv9qddmTZNWZtklFwnnclS1t4G_Oycp%d\" \"-fC:/Users/IT7A49~1.STU/AppData/Local/Temp/magick-ohwpdzjkln0fJ6SxSENQh_7dLf9tY-jH\" \"-fC:/Users/IT7A49~1.STU/AppData/Local/Temp/magick-fJNZLpfoeybJ3gC2B6H2Hze4pKW0aZk4\"' (The system cannot find the file specified.
-
-) @ error/delegate.c/ExternalDelegateCommand/516 at C:/xampp/htdocs/Enterprise-Digital-Filing-System/app/Http/Controllers/DocumentController.php:1193)
-[stacktrace]
+@echo off
+cd C:\path\to\Enterprise-Digital-Filing-System
+git pull origin main
+call composer install --no-dev --optimize-autoloader
+call php artisan migrate --force
+call php artisan view:clear
+call php artisan config:cache
+call php artisan route:cache
+echo Done.
+[
 
