@@ -5,3 +5,83 @@ echo 'Sent!';
 
 
   Symfony\Component\Mailer\Exception\TransportException  Connection could not be established with host "smtp.gmail.com:587": stream_socket_client(): Unable to connect to smtp.gmail.com:587 (A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond).
+
+
+You're using your Active Directory Certificate Authority to issue the certificate, then loading it into XAMPP's Apache. Here's the whole thing step by step. You'll do steps 1–2 on the EDFS server, step 3 against your CA, and steps 4–6 back in XAMPP.
+
+Step 1 — Create a private key and a certificate request (CSR)
+On the EDFS server, open Command Prompt as Administrator:
+
+
+mkdir C:\xampp\apache\conf\ssl
+cd C:\xampp\apache\bin
+set OPENSSL_CONF=C:\xampp\apache\conf\openssl.cnf
+openssl req -new -newkey rsa:2048 -nodes -keyout C:\xampp\apache\conf\ssl\edms.key -out C:\xampp\apache\conf\ssl\edms.csr -subj "/CN=edms.gmbdura.co.zw" -addext "subjectAltName=DNS:edms.gmbdura.co.zw"
+This creates two files: edms.key (the private key — a secret, it never leaves this server) and edms.csr (the request you give to your CA).
+
+The -addext "subjectAltName=..." part is important: modern browsers ignore the plain name and only look at the SAN — without it you'd get certificate warnings even with a valid cert.
+
+Step 2 — Send the request to your AD Certificate Authority
+The server must be joined to the domain (or at least able to reach the CA). Windows has a built-in tool for this:
+
+
+cd C:\xampp\apache\conf\ssl
+certreq -submit -attrib "CertificateTemplate:WebServer" edms.csr edms.crt
+A window may pop up asking which CA to use — pick your enterprise CA.
+If it succeeds, you now have edms.crt — your certificate.
+If you get an error like "template not found" or "denied": the CA needs the Web Server template published and your account needs Enroll permission on it. On the CA server: open certsrv.msc → right-click Certificate Templates → New → Certificate Template to Issue → choose Web Server. Then on the template's Security tab give your account (or the server's computer account) Read + Enroll. Then run the certreq command again.
+
+Step 3 — Get your Root CA certificate (the chain)
+Still on the EDFS server:
+
+
+certutil -ca.cert C:\xampp\apache\conf\ssl\ca-root.cer
+cd C:\xampp\apache\bin
+openssl x509 -inform der -in C:\xampp\apache\conf\ssl\ca-root.cer -out C:\xampp\apache\conf\ssl\ca-root.crt
+(The first command downloads your CA's certificate; the second converts it to the format Apache reads. If the openssl command says it's already readable — "unable to load certificate" does NOT appear — you can also just try using ca-root.cer directly.)
+
+Step 4 — Configure Apache
+Open C:\xampp\apache\conf\extra\httpd-vhosts.conf and add:
+
+
+<VirtualHost *:443>
+    ServerName edms.gmbdura.co.zw
+    DocumentRoot "C:/xampp/htdocs/edfs/public"
+    SSLEngine on
+    SSLCertificateFile "C:/xampp/apache/conf/ssl/edms.crt"
+    SSLCertificateKeyFile "C:/xampp/apache/conf/ssl/edms.key"
+    SSLCertificateChainFile "C:/xampp/apache/conf/ssl/ca-root.crt"
+    <Directory "C:/xampp/htdocs/edfs/public">
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+And change your existing port-80 entry to forward everyone to HTTPS:
+
+
+<VirtualHost *:80>
+    ServerName edms.gmbdura.co.zw
+    Redirect permanent / https://edms.gmbdura.co.zw/
+</VirtualHost>
+Check C:\xampp\apache\conf\httpd.conf has these two lines without a # in front (usually already fine in XAMPP):
+
+
+LoadModule ssl_module modules/mod_ssl.so
+Include conf/extra/httpd-ssl.conf
+Step 5 — Restart and update the app
+Restart Apache in the XAMPP Control Panel. If it won't start, read the last lines of C:\xampp\apache\logs\error.log — it names the exact file it's unhappy with.
+In the project:
+
+cd C:\xampp\htdocs\edfs
+php artisan config:cache
+(.env should already have APP_URL=https://edms.gmbdura.co.zw and the https MICROSOFT_REDIRECT_URI.)
+3. In Azure Portal → App registrations → EDFS → Authentication: the redirect URI must be https://edms.gmbdura.co.zw/auth/microsoft/callback — Microsoft refuses plain http.
+
+Step 6 — Test the trust
+Open https://edms.gmbdura.co.zw from a domain-joined PC — you should get the padlock with no warning, because Active Directory automatically pushes your root CA into every domain computer's trusted list.
+
+Two things to know about this setup, honestly:
+
+Non-domain devices (personal phones, home laptops) don't have your root CA, so they'll see a "not private" warning. For a GMB-internal system used from work PCs, that's normally acceptable. If executives will use phones, IT can push the root CA to managed mobiles, or those devices can install ca-root.cer manually once.
+The certificate expires (Web Server template default is 2 years) and it does not renew itself like Let's Encrypt. Put a reminder in your calendar a month before — renewal is just repeating steps 1–2 and restarting Apache. Note the expiry date: after step 2 run certutil -dump edms.crt | findstr NotAfter to see it.
+If certreq gives you any error text, paste it here — CA permission problems have very specific messages and I can tell you exactly which screen to fix it on.
